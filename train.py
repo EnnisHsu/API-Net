@@ -20,14 +20,14 @@ parser.add_argument('--exp_name', default=None, type=str,
                     help='name of experiment')
 parser.add_argument('--data', metavar='DIR',default='',
                     help='path to dataset')
-parser.add_argument('-j', '--workers', default=10, type=int, metavar='N',
+parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=100, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('-b', '--batch-size', default=100, type=int,
-                    metavar='N', help='mini-batch size (default: 256)')
+parser.add_argument('-b', '--batch-size', default=64, type=int,
+                    metavar='N', help='mini-batch size (default: 32)')
 parser.add_argument('--lr', '--learning-rate', default=0.01, type=float,
                     metavar='LR', help='initial learning rate')
 parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
@@ -44,9 +44,9 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
-parser.add_argument('--n_classes', default=30, type=int,
+parser.add_argument('--n_classes', default=9, type=int,
                     help='the number of classes')
-parser.add_argument('--n_samples', default=4, type=int,
+parser.add_argument('--n_samples', default=3, type=int,
                     help='the number of samples per class')
 
 
@@ -71,23 +71,24 @@ def main():
     optimizer_conv = torch.optim.SGD(model.conv.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
-
+    print(optimizer_conv)
     fc_parameters = [value for name, value in model.named_parameters() if 'conv' not in name]
     optimizer_fc = torch.optim.SGD(fc_parameters, args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
+    print(optimizer_fc)
     if args.resume:
         if os.path.isfile(args.resume):
-            print 'loading checkpoint {}'.format(args.resume)
+            print('loading checkpoint {}'.format(args.resume))
             checkpoint = torch.load(args.resume)
             args.start_epoch = checkpoint['epoch']
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
             optimizer_conv.load_state_dict(checkpoint['optimizer_conv'])
             optimizer_fc.load_state_dict(checkpoint['optimizer_fc'])
-            print 'loaded checkpoint {}(epoch {})'.format(args.resume, checkpoint['epoch'])
+            print('loaded checkpoint {}(epoch {})'.format(args.resume, checkpoint['epoch']))
         else:
-            print 'no checkpoint found at {}'.format(args.resume)
+            print('no checkpoint found at {}'.format(args.resume))
 
 
     cudnn.benchmark = True
@@ -108,9 +109,9 @@ def main():
         num_workers=args.workers, pin_memory=True)
     scheduler_conv = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_conv, 100*len(train_loader))
     scheduler_fc = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_fc, 100*len(train_loader))
-
+    print("conv {} fc {} ".scheduler_conv,scheduler_fc)
     step = 0
-    print 'START TIME:', time.asctime(time.localtime(time.time()))
+    print('START TIME:', time.asctime(time.localtime(time.time())))
     for epoch in range(args.start_epoch, args.epochs):
         step = train(train_loader, model, criterion, optimizer_conv, scheduler_conv, optimizer_fc, scheduler_fc, epoch, step)
 
@@ -148,8 +149,8 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
         labels1 = labels1.to(device)
         labels2 = labels2.to(device)
 
-        self_logits = torch.zeros(2*batch_size, 200).to(device)
-        other_logits= torch.zeros(2*batch_size, 200).to(device)
+        self_logits = torch.zeros(2*batch_size, 128).to(device)
+        other_logits= torch.zeros(2*batch_size, 128).to(device)
         self_logits[:batch_size] = logit1_self
         self_logits[batch_size:] = logit2_self
         other_logits[:batch_size] = logit1_other
