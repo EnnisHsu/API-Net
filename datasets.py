@@ -26,7 +26,7 @@ class RandomDataset(Dataset):
         image_path = image_name
         img = self.dataloader(image_path)
         img = self.transform(img)
-        label = int(label)
+        label = int(label)-1
         label = torch.LongTensor([label])
 
         return [img, label]
@@ -56,7 +56,7 @@ class BatchDataset(Dataset):
         image_path = image_name
         img = self.dataloader(image_path)
         img = self.transform(img)
-        label = int(label)
+        label = int(label)-1
         label = torch.LongTensor([label])
 
         return [img, label]

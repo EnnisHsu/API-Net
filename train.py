@@ -26,7 +26,7 @@ parser.add_argument('--epochs', default=100, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('-b', '--batch-size', default=64, type=int,
+parser.add_argument('-b', '--batch-size', default=100, type=int,
                     metavar='N', help='mini-batch size (default: 32)')
 parser.add_argument('--lr', '--learning-rate', default=0.01, type=float,
                     metavar='LR', help='initial learning rate')
@@ -71,12 +71,12 @@ def main():
     optimizer_conv = torch.optim.SGD(model.conv.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
-    print(optimizer_conv)
+
     fc_parameters = [value for name, value in model.named_parameters() if 'conv' not in name]
     optimizer_fc = torch.optim.SGD(fc_parameters, args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
-    print(optimizer_fc)
+
     if args.resume:
         if os.path.isfile(args.resume):
             print('loading checkpoint {}'.format(args.resume))
@@ -109,7 +109,7 @@ def main():
         num_workers=args.workers, pin_memory=True)
     scheduler_conv = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_conv, 100*len(train_loader))
     scheduler_fc = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_fc, 100*len(train_loader))
-    print("conv {} fc {} ".scheduler_conv,scheduler_fc)
+
     step = 0
     print('START TIME:', time.asctime(time.localtime(time.time())))
     for epoch in range(args.start_epoch, args.epochs):
@@ -148,9 +148,9 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
         batch_size = logit1_self.shape[0]
         labels1 = labels1.to(device)
         labels2 = labels2.to(device)
-
-        self_logits = torch.zeros(2*batch_size, 128).to(device)
-        other_logits= torch.zeros(2*batch_size, 128).to(device)
+        #print(batch_size)
+        self_logits = torch.zeros(2*batch_size, 200).to(device)
+        other_logits= torch.zeros(2*batch_size, 200).to(device)
         self_logits[:batch_size] = logit1_self
         self_logits[batch_size:] = logit2_self
         other_logits[:batch_size] = logit1_other
@@ -160,8 +160,9 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
         logits = torch.cat([self_logits, other_logits], dim=0)
         targets = torch.cat([labels1, labels2, labels1, labels2], dim=0)
         softmax_loss = criterion(logits, targets)
-
-        self_scores = softmax_layer(self_logits)[torch.arange(2*batch_size).to(device).long(),
+        #print(torch.arange(2*batch_size,device=device).long())
+        #print("lb1 {}    lb2 {}".format(labels1,labels2))
+        self_scores = softmax_layer(self_logits)[torch.arange(2*batch_size,device=device).long(),
                                                          torch.cat([labels1, labels2], dim=0)]
         other_scores = softmax_layer(other_logits)[torch.arange(2*batch_size).to(device).long(),
                                                          torch.cat([labels1, labels2], dim=0)]
