@@ -107,6 +107,7 @@ def main():
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_sampler=train_sampler,
         num_workers=args.workers, pin_memory=True)
+    print(len(train_loader),len(train_dataset))
     scheduler_conv = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_conv, 100*len(train_loader))
     scheduler_fc = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_fc, 100*len(train_loader))
 
@@ -208,7 +209,7 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
                    data_time=data_time, loss=losses, softmax_loss=softmax_losses, rank_loss=rank_losses,
                    top1=top1, top5=top5, step=step, time= time.asctime(time.localtime(time.time()))))
 
-        if i== len(train_loader) - 1:
+        if i == len(train_loader) - 1:
             val_dataset = RandomDataset(transform=transforms.Compose([
                 transforms.Resize([512,512]),
                 transforms.CenterCrop([448,448]),

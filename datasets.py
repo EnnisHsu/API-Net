@@ -6,7 +6,10 @@ import numpy as np
 
 def default_loader(path):
     try:
-        img = Image.open(path).convert('RGB')
+        img = Image.open(path)
+        print("read img"+path)
+        img = img.convert('RGB')
+        print("convert img")
     except:
         with open('read_error.txt', 'a') as fid:
             fid.write(path+'\n')
