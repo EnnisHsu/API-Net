@@ -44,7 +44,7 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
-parser.add_argument('--n_classes', default=9, type=int,
+parser.add_argument('--n_classes', default=6, type=int,
                     help='the number of classes')
 parser.add_argument('--n_samples', default=3, type=int,
                     help='the number of samples per class')
@@ -110,7 +110,6 @@ def main():
     print(len(train_loader),len(train_dataset))
     scheduler_conv = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_conv, 100*len(train_loader))
     scheduler_fc = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_fc, 100*len(train_loader))
-
     step = 0
     print('START TIME:', time.asctime(time.localtime(time.time())))
     for epoch in range(args.start_epoch, args.epochs):
@@ -134,10 +133,9 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
     end = time.time()
     rank_criterion = nn.MarginRankingLoss(margin=0.05)
     softmax_layer = nn.Softmax(dim=1).to(device)
-
-    for i, (input, target) in enumerate(train_loader):
+    print("train_loader length:{}".format(len(train_loader)))
+    for i, (input, target) in enumerate(train_loader,1):
         model.train()
-
         # measure data loading time
         data_time.update(time.time() - end)
         input_var = input.to(device)
@@ -210,6 +208,7 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
                    top1=top1, top5=top5, step=step, time= time.asctime(time.localtime(time.time()))))
 
         if i == len(train_loader) - 1:
+            print("test part")
             val_dataset = RandomDataset(transform=transforms.Compose([
                 transforms.Resize([512,512]),
                 transforms.CenterCrop([448,448]),
@@ -235,6 +234,7 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
             }, is_best)
 
         step = step +1
+    print("finish step {} with {}".format(step,i))
     return step
 
 

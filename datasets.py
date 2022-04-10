@@ -6,10 +6,7 @@ import numpy as np
 
 def default_loader(path):
     try:
-        img = Image.open(path)
-        print("read img"+path)
-        img = img.convert('RGB')
-        print("convert img")
+        img = Image.open(path).convert('RGB')
     except:
         with open('read_error.txt', 'a') as fid:
             fid.write(path+'\n')
@@ -21,12 +18,14 @@ class RandomDataset(Dataset):
         self.transform = transform
         self.dataloader = dataloader
 
-        with open('/home/cell/datasets/CUB_200_2011/val.txt', 'r') as fid:
+        with open('/home/cell/datasets/cell/val.txt', 'r') as fid:
             self.imglist = fid.readlines()
 
     def __getitem__(self, index):
         image_name, label = self.imglist[index].strip().split()
         image_path = image_name
+        image_path=image_path[1:]
+        image_path="/home/cell/datasets"+image_path
         img = self.dataloader(image_path)
         img = self.transform(img)
         label = int(label)-1
@@ -43,8 +42,9 @@ class BatchDataset(Dataset):
         self.transform = transform
         self.dataloader = dataloader
 
-        with open('/home/cell/datasets/CUB_200_2011/train.txt', 'r') as fid:
+        with open('/home/cell/datasets/cell/train.txt', 'r') as fid:
             self.imglist = fid.readlines()
+        print("train loader prepare")
 
         self.labels = []
         for line in self.imglist:
@@ -57,6 +57,9 @@ class BatchDataset(Dataset):
     def __getitem__(self, index):
         image_name, label = self.imglist[index].strip().split()
         image_path = image_name
+        image_path=image_path[1:]
+        image_path="/home/cell/datasets"+image_path
+        
         img = self.dataloader(image_path)
         img = self.transform(img)
         label = int(label)-1

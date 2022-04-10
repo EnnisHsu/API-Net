@@ -2,13 +2,13 @@ import os
 import time
 time_start = time.time()
 print('start_read_dateset')
-path_images = './CUB_200_2011/images.txt'
-path_split =  './CUB_200_2011/train_test_split.txt'
-path_class="./CUB_200_2011/image_class_labels.txt"
-path="./CUB_200_2011/images/"
+path_images = './cell/images.txt'
+path_split =  './cell/train_test_split.txt'
+path_class="./cell/image_class_labels.txt"
+path="./cell/images/"
 print('fin_read_dateset_and_new_txt')
-f_test=open("./CUB_200_2011/val.txt","w")
-f_train=open("./CUB_200_2011/train.txt","w")
+f_test=open("./cell/val.txt","w")
+f_train=open("./cell/train.txt","w")
 images = []
 with open(path_images,'r') as f:
     for line in f:
@@ -32,6 +32,6 @@ for k in range(num):
     else:
         f_test.write(path+file_name+" "+Class+"\n")
 time_end = time.time()
-print('CUB200 train set and val set split successfully, time%s!!' % (time_end - time_start))
+print('cell train set and val set split successfully, time%s!!' % (time_end - time_start))
 f_test.close()
 f_train.close()
