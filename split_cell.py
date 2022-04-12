@@ -1,4 +1,5 @@
 import os
+import random
 
 
 def getFlist(data_path):
@@ -15,15 +16,23 @@ def getFlist(data_path):
             dirnum = dirnum +1
             image_file.write(str(num)+" "+new_dir[32:]+"\n")
             icl_file.write(str(num)+" "+label+"\n")
-            valnum=int(0.2*len(dir_names))
-            if valnum!=0:
-                valgap=int(len(dir_names)/valnum)
-            else:
-                valgap=0
-            if (valgap>2 and dirnum%valgap==int(valgap/2)):
-                tts_file.write(str(num)+" 0\n")
-            else:
+            # valnum=int(0.2*len(dir_names))
+            # if valnum!=0:
+            #     valgap=int(len(dir_names)/valnum)
+            # else:
+            #     valgap=0
+            # if (valgap>2 and dirnum%valgap==int(valgap/2)):
+            #     tts_file.write(str(num)+" 0\n")
+            # else:
+            #     tts_file.write(str(num)+" 1\n")
+            if data_path.find('new')!=-1:
                 tts_file.write(str(num)+" 1\n")
+            else:
+                # res = random.randint(0,1)
+                if num % 2 == 1:
+                    tts_file.write(str(num)+" 1\n")
+                else:
+                    tts_file.write(str(num)+" 0\n")
         if os.path.isdir(new_dir):
             getFlist(new_dir)
 

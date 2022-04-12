@@ -44,7 +44,7 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
-parser.add_argument('--n_classes', default=6, type=int,
+parser.add_argument('--n_classes', default=9, type=int,
                     help='the number of classes')
 parser.add_argument('--n_samples', default=3, type=int,
                     help='the number of samples per class')
