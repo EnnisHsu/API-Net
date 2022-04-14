@@ -1,3 +1,4 @@
+# coding:gb2312
 import argparse
 import os
 import time
@@ -7,6 +8,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim
 import torch.utils.data
 import torchvision.transforms as transforms
+from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 from models import API_Net 
 from datasets import RandomDataset, BatchDataset, BalancedBatchSampler
@@ -59,7 +61,8 @@ def main():
     torch.manual_seed(2)
     torch.cuda.manual_seed_all(2)
     np.random.seed(2)
-
+    global writer
+    writer=SummaryWriter('./logs/',10)
 
     # create model
     model = API_Net()
@@ -89,7 +92,8 @@ def main():
             print('loaded checkpoint {}(epoch {})'.format(args.resume, checkpoint['epoch']))
         else:
             print('no checkpoint found at {}'.format(args.resume))
-
+    global classes
+    classes=('01µ¥ºËÏµ','02Ô­Á£','03ÔçÓ×Á£','04ÖÐÓ×Á£','05ÍíÓ×Á£','06¸Ë×´ºË','07·ÖÒ¶ºË','08ÆäËûÁ£Ïµ','09ÆäËûºìÏµ','10ÖÐÓ×ºì','11ÍíÓ×ºì','12Ô­ÁÜÏ¸°û','13³ÉÊìÁÜ°ÍÏ¸°û','14ÆäËûÁÜ°ÍÏ¸°û')
 
     cudnn.benchmark = True
     # Data loading code
@@ -232,6 +236,8 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
                 'optimizer_conv': optimizer_conv.state_dict(),
                 'optimizer_fc': optimizer_fc.state_dict(),
             }, is_best)
+            writer.add_scalar('Loss',loss,epoch+1)
+            writer.add_scalar('prec1',prec1,epoch+1)
 
         step = step +1
     print("finish step {} with {}".format(step,i))
@@ -251,7 +257,8 @@ def validate(val_loader, model, criterion):
     # switch to evaluate mode
     model.eval()
     end = time.time()
-
+    class_correct = list(0. for i in range(14))
+    class_total = list(0. for i in range(14))
     with torch.no_grad():
         for i, (input, target) in enumerate(val_loader):
 
@@ -273,6 +280,12 @@ def validate(val_loader, model, criterion):
             batch_time.update(time.time() - end)
             end = time.time()
 
+            prec_ray,prec_label = torch.max(logits,1)
+            c = (prec_label == target_var).squeeze()
+            for j in range(target_var.numel()):
+                label = target_var[j]
+                class_correct[label] +=c[j].item()
+                class_total[label] +=1
 
 
             if i % args.print_freq == 0:
@@ -284,7 +297,11 @@ def validate(val_loader, model, criterion):
                         i, len(val_loader), batch_time=batch_time, softmax_loss=softmax_losses,
                         top1=top1, top5=top5, time=time.asctime(time.localtime(time.time()))))
         print(' * Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
-
+    for i in range(14):
+        if (class_total[i]!=0):
+            print('Accuracy of %5s(%d): %5f %%'%(classes[i],class_total[i],100*class_correct[i]/class_total[i]))
+        else:
+            print('Accuracy of %5s(%d): %5f %%'%(classes[i],class_total[i],-1))
     return top1.avg
 
 

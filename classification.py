@@ -27,10 +27,11 @@ for k in range(num):
     file_name = images[k][-1]
     label = split[k][-1]
     Class=clss[k][-1]
-    if int(label) == 1:
+    if (int(label) == 1):
         f_train.write(path+file_name+" "+Class+"\n")
     else:
-        f_test.write(path+file_name+" "+Class+"\n")
+        if (int(label) == 0):
+            f_test.write(path+file_name+" "+Class+"\n")
 time_end = time.time()
 print('cell train set and val set split successfully, time%s!!' % (time_end - time_start))
 f_test.close()

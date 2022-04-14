@@ -26,13 +26,13 @@ def getFlist(data_path):
             # else:
             #     tts_file.write(str(num)+" 1\n")
             if data_path.find('new')!=-1:
-                tts_file.write(str(num)+" 1\n")
+                tts_file.write(str(num)+" 2\n")
             else:
-                # res = random.randint(0,1)
-                if num % 2 == 1:
-                    tts_file.write(str(num)+" 1\n")
-                else:
+                res = random.randint(0,4)
+                if res == 0:
                     tts_file.write(str(num)+" 0\n")
+                else:
+                    tts_file.write(str(num)+" 1\n")
         if os.path.isdir(new_dir):
             getFlist(new_dir)
 
