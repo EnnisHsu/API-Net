@@ -17,8 +17,8 @@ class API_Net(nn.Module):
     def __init__(self):
         super(API_Net, self).__init__()
 
-        resnet101 = models.resnet101(pretrained=True)
-        layers = list(resnet101.children())[:-2]
+        resnet50 = models.resnet50(pretrained=True)
+        layers = list(resnet50.children())[:-2]
 
         self.conv = nn.Sequential(*layers)
         self.avg = nn.AvgPool2d(kernel_size=14, stride=1)

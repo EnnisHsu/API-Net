@@ -138,7 +138,7 @@ def train(train_loader, model, criterion, optimizer_conv,scheduler_conv, optimiz
     rank_criterion = nn.MarginRankingLoss(margin=0.05)
     softmax_layer = nn.Softmax(dim=1).to(device)
     print("train_loader length:{}".format(len(train_loader)))
-    for i, (input, target) in enumerate(train_loader,1):
+    for i, (input, target) in enumerate(train_loader,0):
         model.train()
         # measure data loading time
         data_time.update(time.time() - end)

@@ -5,6 +5,7 @@ import random
 def getFlist(data_path):
     global label
     global num
+    global res
     dir_names = os.listdir(data_path)
     dirnum = 0
     for dir_name in dir_names:
@@ -28,11 +29,17 @@ def getFlist(data_path):
             if data_path.find('new')!=-1:
                 tts_file.write(str(num)+" 2\n")
             else:
-                res = random.randint(0,4)
-                if res == 0:
-                    tts_file.write(str(num)+" 0\n")
+                if num % 2==1:
+                    res = random.randint(0,1)
+                    if res == 0:
+                        tts_file.write(str(num)+" 0\n")
+                    else:
+                        tts_file.write(str(num)+" 1\n")
                 else:
-                    tts_file.write(str(num)+" 1\n")
+                    if res == 0:
+                        tts_file.write(str(num)+" 1\n")
+                    else:
+                        tts_file.write(str(num)+" 0\n")
         if os.path.isdir(new_dir):
             getFlist(new_dir)
 
