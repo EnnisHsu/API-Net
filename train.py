@@ -28,7 +28,7 @@ parser.add_argument('--epochs', default=100, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('-b', '--batch-size', default=100, type=int,
+parser.add_argument('-b', '--batch-size', default=64, type=int,
                     metavar='N', help='mini-batch size (default: 32)')
 parser.add_argument('--lr', '--learning-rate', default=0.01, type=float,
                     metavar='LR', help='initial learning rate')
@@ -46,7 +46,7 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
-parser.add_argument('--n_classes', default=9, type=int,
+parser.add_argument('--n_classes', default=14, type=int,
                     help='the number of classes')
 parser.add_argument('--n_samples', default=3, type=int,
                     help='the number of samples per class')
